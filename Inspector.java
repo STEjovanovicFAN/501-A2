@@ -6,13 +6,17 @@ import java.lang.reflect.Array;
 
 public class Inspector {
 
+    public static final String NONE = "none"; 
+    public static final String VOID = "void"; 
+    public static final String NULL = "null";
+    public static final String ARRAY = "Array";
+
     public void inspect(Object obj, boolean recursive) {
         Class c = getClass(obj);
         inspectClass(c, obj, recursive, 0);
     }
 
     private void inspectClass(Class c, Object obj, boolean recursive, int depth) {
-
         formatOutputDepth("Declaring Class Name: " + getSimpleName(c), depth);
         inspectImmediateSuperClass(c, obj, recursive, depth);
         inspectInterfaces(c, obj, recursive, depth);
@@ -23,7 +27,7 @@ public class Inspector {
 
     private void inspectFields(Class c, Object obj, boolean recursive, int depth){
         if(checkArrayEmpty(getDeclaredFields(c))){
-            formatOutputDepth("Declared Fields: " + "none", depth);
+            formatOutputDepth("Declared Fields: " + NONE, depth);
         }
 
         else{
@@ -31,19 +35,21 @@ public class Inspector {
                 formatOutputDepth("Declared Field Name: " + field.getName(), depth);
 
                 if(field.getType().isArray()){
-                    formatOutputDepth("- Type: " + "Array", depth+1);
+                    formatOutputDepth("- Type: " + ARRAY, depth+1);
                 }
 
                 else{
-                    formatOutputDepth("- Type: " + field.getType().getName(), depth+1);
+                    String typeName = field.getType().getName();
+                    formatOutputDepth("- Type: " + typeName, depth+1);
                 }
-
-                formatOutputDepth("- Modifier: " + ModifierToString(field.getModifiers()), depth+1);
+                String modName = ModifierToString(field.getModifiers());
+                formatOutputDepth("- Modifier: " + modName, depth+1);
 
                 field.setAccessible(true);
                 try{
                     if(field.getType().isPrimitive()){
-                        formatOutputDepth("- Value: " + field.get(obj), depth+1);
+                        String valueType = field.get(obj);
+                        formatOutputDepth("- Value: " + valueType, depth+1);
                     }
 
                     else if(field.getType().isArray()){
@@ -57,14 +63,15 @@ public class Inspector {
                         }
 
                         else{
-                            formatOutputDepth("- Value: " + getObjectReference(obj, field), depth+1);
+                            String objectReference = getObjectReference(obj, field);
+                            formatOutputDepth("- Value: " + objectReference, depth+1);
                         }
                     }
 
                 }
 
                 catch(NullPointerException e){
-                    formatOutputDepth("- Value: " + "null", depth+1);
+                    formatOutputDepth("- Value: " + NULL, depth+1);
                 }
 
                 catch(IllegalAccessException e){
@@ -80,16 +87,19 @@ public class Inspector {
     }
 
     private void handelArrayField(Class c, Object obj, boolean recursive, int depth){
-        formatOutputDepth("- Component Type: " + getSimpleName(c.getComponentType()), depth+1);
-        formatOutputDepth("- Length: " + ArrayGetLength(obj), depth+1);
+        String componentType = getSimpleName(c.getComponentType());
+        String lengthUnit = ArrayGetLength(obj);
+        formatOutputDepth("- Component Type: " + componentType, depth+1);
+        formatOutputDepth("- Length: " + lengthUnit, depth+1);
         formatOutputDepth("- Contents: ", depth+1);
         
         for(int i = 0; i < ArrayGetLength(obj); i++){
             if(ArrayGetObj(obj, i) == null){
-                formatOutputDepth("- " + "null", depth+2);
+                formatOutputDepth("- " + NULL, depth+2);
             }
             else if(c.getComponentType().isPrimitive()){
-                formatOutputDepth("- " + getSimpleName(getClass(ArrayGetObj(obj, i))), depth+2);
+                String arrayValueType =  getSimpleName(getClass(ArrayGetObj(obj, i)));
+                formatOutputDepth("- " + arrayValueType, depth+2);
             }
             //2d arrays
             else if(c.getComponentType().isArray()){
@@ -103,7 +113,8 @@ public class Inspector {
                     }
 
                     else{
-                        formatOutputDepth("- Value: " + getObjectReference(obj, i), depth+2);
+                        String objReferance = getObjectReference(obj, i);
+                        formatOutputDepth("- Value: " + objReferance, depth+2);
                     }
                 }
             }
@@ -112,65 +123,71 @@ public class Inspector {
 
     private void inspectMethods(Class c, Object obj, boolean recursive, int depth){
         if(checkArrayEmpty(getDeclaredMethods(c))){
-            formatOutputDepth("Method Name: " + "none", depth);
+            formatOutputDepth("Method Name: " + NONE, depth);
         }
 
         else{
             for(Method meth : getDeclaredMethods(c)){
-                formatOutputDepth("Method Name: " + meth.getName(), depth);
+                String methodName = meth.getName();
+                formatOutputDepth("Method Name: " + methodName, depth);
 
                 if(checkArrayEmpty(meth.getExceptionTypes())){
-                    formatOutputDepth("- Exception Type: " + "none", depth+1);
+                    formatOutputDepth("- Exception Type: " + NONE, depth+1);
                 }
                 else{
                     for(Class except: meth.getExceptionTypes()){
-                        formatOutputDepth("- Exception Type: " + except.getName(), depth+1);
+                        String exceptionTypeName = except.getName();
+                        formatOutputDepth("- Exception Type: " + exceptionTypeName, depth+1);
                     }
                 }
 
                 if(checkArrayEmpty(meth.getParameterTypes())){
-                    formatOutputDepth("- Parameter Type: " + "none", depth+1);
+                    formatOutputDepth("- Parameter Type: " + NONE, depth+1);
                 }
 
                 else{
                     for(Class parType : meth.getParameterTypes()){
-                        formatOutputDepth("- Parameter Type: " + getSimpleName(parType), depth+1);
+                        String parameterTypeName = getSimpleName(parType);
+                        formatOutputDepth("- Parameter Type: " + parameterTypeName, depth+1);
                     }
                 }
 
                 if(meth.getReturnType() == null){
-                    formatOutputDepth("- Return Type: " + "void", depth+1);
+                    formatOutputDepth("- Return Type: " + VOID, depth+1);
                 }
 
                 else{
-                    formatOutputDepth("- Return Type: " + meth.getReturnType(), depth+1);
+                    String returnTypeName = meth.getReturnType();
+                    formatOutputDepth("- Return Type: " + returnTypeName, depth+1);
                 }
-
-                formatOutputDepth("- Modifier: " + ModifierToString(meth.getModifiers()), depth+1);
+                String modName = ModifierToString(meth.getModifiers());
+                formatOutputDepth("- Modifier: " + modName, depth+1);
             }
         }
     }
 
     private void inspectConstructors(Class c, Object obj, boolean recursive, int depth){
         if(checkArrayEmpty(getDeclaredConstructors(c))){
-            formatOutputDepth("Constructor Name: " + "none",depth);
+            formatOutputDepth("Constructor Name: " + NONE,depth);
         }
 
         else{
             for(Constructor cons: getDeclaredConstructors(c)){
-                formatOutputDepth("Constructor Name: " + cons.getName(), depth);
+                String constantName = cons.getName();
+                formatOutputDepth("Constructor Name: " + constantName, depth);
 
                 if(checkArrayEmpty(cons.getParameterTypes())){
-                    formatOutputDepth("- Parameter: " + "none", depth+1);
+                    formatOutputDepth("- Parameter: " + NONE, depth+1);
                 }
 
                 else{
                     for(Class par: cons.getParameterTypes()){
-                        formatOutputDepth("- Parameter: " + par.getName(), depth+1);
+                        String parametername = par.getName();
+                        formatOutputDepth("- Parameter: " + parametername, depth+1);
                     }     
                 }
-
-                formatOutputDepth("- Modifier: " + ModifierToString(cons.getModifiers()), depth+1);
+                String modName = ModifierToString(cons.getModifiers());
+                formatOutputDepth("- Modifier: " + modName, depth+1);
 
             }
         }
@@ -178,12 +195,13 @@ public class Inspector {
 
     private void inspectInterfaces(Class c, Object obj, boolean recursive, int depth){
         if(checkArrayEmpty(getInterfaces(c))){
-            formatOutputDepth("Interface Name: "  + "none", depth);
+            formatOutputDepth("Interface Name: "  + NONE, depth);
         }
 
         else{
             for(Class inter: getInterfaces(c)){
-                formatOutputDepth("Interface Name: " + getSimpleName(inter),depth);
+                String interfaceName = getSimpleName(inter);
+                formatOutputDepth("Interface Name: " + interfaceName,depth);
                 inspectClass(inter, obj, recursive, depth+1);
             }
         }
@@ -191,11 +209,12 @@ public class Inspector {
 
     private void inspectImmediateSuperClass(Class c, Object obj, boolean recursive, int depth){
         if(getSuperClass(c) == null){
-            formatOutputDepth("Super Class Name: " + "none", depth);
+            formatOutputDepth("Super Class Name: " + NONE, depth);
         }
 
         else{
-            formatOutputDepth("Super Class Name: " + getSimpleName(getSuperClass(c)),depth);
+            String superClassName = getSimpleName(getSuperClass(c));
+            formatOutputDepth("Super Class Name: " + superClassName,depth);
             inspectClass(getSuperClass(c), obj, recursive, depth+1);
         }
     }
