@@ -14,11 +14,11 @@ public class Inspector {
     private void inspectClass(Class c, Object obj, boolean recursive, int depth) {
 
         formatOutputDepth("Declaring Class Name: " + getSimpleName(c), depth);
-        getImmediateSuperClass(c, obj, recursive, depth);
-        getInterfaces(c, obj, recursive, depth);
-        getConstructors(c, obj, recursive, depth);
-        getMethods(c, obj, recursive, depth);
-        getFields(c, obj, recursive, depth);
+        inspectImmediateSuperClass(c, obj, recursive, depth);
+        inspectInterfaces(c, obj, recursive, depth);
+        inspectConstructors(c, obj, recursive, depth);
+        inspectMethods(c, obj, recursive, depth);
+        inspectFields(c, obj, recursive, depth);
     }    
 
     private <T> boolean checkArrayEmpty( T [] array){
@@ -35,7 +35,7 @@ public class Inspector {
         System.out.println(value);
     }
 
-    private void getImmediateSuperClass(Class c, Object obj, boolean recursive, int depth){
+    private void inspectImmediateSuperClass(Class c, Object obj, boolean recursive, int depth){
         if(getSuperClass(c) == null){
             formatOutputDepth("Super Class Name: " + "none", depth);
         }
@@ -46,7 +46,7 @@ public class Inspector {
         }
     }
 
-    private void getInterfaces(Class c, Object obj, boolean recursive, int depth){
+    private void inspectInterfaces(Class c, Object obj, boolean recursive, int depth){
         if(checkArrayEmpty(getInterfaces(c))){
             formatOutputDepth("Interface Name: "  + "none", depth);
         }
@@ -59,7 +59,7 @@ public class Inspector {
         }
     }
 
-    private void getConstructors(Class c, Object obj, boolean recursive, int depth){
+    private void inspectConstructors(Class c, Object obj, boolean recursive, int depth){
         if(checkArrayEmpty(getDeclaredConstructors(c))){
             formatOutputDepth("Constructor Name: " + "none",depth);
         }
@@ -84,7 +84,7 @@ public class Inspector {
         }
     }
 
-    private void getMethods(Class c, Object obj, boolean recursive, int depth){
+    private void inspectMethods(Class c, Object obj, boolean recursive, int depth){
         if(checkArrayEmpty(getDeclaredMethods(c))){
             formatOutputDepth("Method Name: " + "none", depth);
         }
@@ -125,7 +125,7 @@ public class Inspector {
         }
     }
 
-    private void getFields(Class c, Object obj, boolean recursive, int depth){
+    private void inspectFields(Class c, Object obj, boolean recursive, int depth){
         if(checkArrayEmpty(getDeclaredFields(c))){
             formatOutputDepth("Declared Fields: " + "none", depth);
         }
