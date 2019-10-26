@@ -19,6 +19,7 @@ public class Inspector {
     private void inspectClass(Class c, Object obj, boolean recursive, int depth) {
         String className = getSimpleName(c);
         formatOutputDepth("Declaring Class Name: " + className, depth);
+        
         inspectImmediateSuperClass(c, obj, recursive, depth);
         inspectInterfaces(c, obj, recursive, depth);
         inspectConstructors(c, obj, recursive, depth);
