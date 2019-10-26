@@ -161,7 +161,7 @@ public class Inspector {
                         }
 
                         else{
-                            formatOutputDepth("- Value: " + getClass(field.get(obj)).getName() + "@" + Integer.toHexString(System.identityHashCode(field.get(obj))), depth+1);
+                            formatOutputDepth("- Value: " + getObjectReference(obj, field), depth+1);
                         }
                     }
 
@@ -207,7 +207,7 @@ public class Inspector {
                     }
 
                     else{
-                        formatOutputDepth("- Value: " + getClass(ArrayGetObj(obj, i)).getName() + "@" + Integer.toHexString(System.identityHashCode(ArrayGetObj(obj, i))), depth+2);
+                        formatOutputDepth("- Value: " + getObjectReference(obj, i), depth+2);
                     }
                 }
             }
@@ -255,5 +255,22 @@ public class Inspector {
         return Modifier.toString(i);
     }
 
+    private String getObjectReference(Object obj, int i){
+        String className = getClass(ArrayGetObj(obj, i)).getName();
+        String hashCode = Integer.toHexString(System.identityHashCode(ArrayGetObj(obj, i)));
+        return className + "@" + hashCode; 
+    }
 
+    private String getObjectReference(Object obj, Field field){
+        String className = "";
+        String hashCode = "";
+        try{
+            className = getClass(field.get(obj)).getName();
+            hashCode = Integer.toHexString(System.identityHashCode(field.get(obj)));
+        }
+        catch(Exception e){
+            System.out.println("Error: something happened" + e);
+        }
+        return className + "@" + hashCode; 
+    }
 }
