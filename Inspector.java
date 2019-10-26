@@ -221,54 +221,54 @@ public class Inspector {
         }
     }
 
-    private Class getSuperClass(Class c){
+    public Class getSuperClass(Class c){
         return c.getSuperclass();
     }
 
-    private Class [] getInterfaces(Class c){
+    public Class [] getInterfaces(Class c){
         return c.getInterfaces();
     }
 
-    private String getSimpleName(Class c){
+    public String getSimpleName(Class c){
         return c.getSimpleName();
     }
 
-    private Constructor [] getDeclaredConstructors(Class c){
+    public Constructor [] getDeclaredConstructors(Class c){
         return c.getDeclaredConstructors();
     }
     
-    private Class getClass(Object obj)
+    public Class getClass(Object obj)
 	{
 		return obj.getClass();
     }
     
-    private Object ArrayGetObj(Object obj, int i){
+    public Object ArrayGetObj(Object obj, int i){
         return Array.get(obj, i);
     }
 
-    private int ArrayGetLength(Object obj){
+    public int ArrayGetLength(Object obj){
         return Array.getLength(obj);
     }
 
-    private Field [] getDeclaredFields(Class c){
+    public Field [] getDeclaredFields(Class c){
         return c.getDeclaredFields();
     }
 
-    private Method [] getDeclaredMethods(Class c){
+    public Method [] getDeclaredMethods(Class c){
         return c.getDeclaredMethods();
     }
 
-    private String ModifierToString (int i){
+    public String ModifierToString (int i){
         return Modifier.toString(i);
     }
 
-    private String getObjectReference(Object obj, int i){
+    public String getObjectReference(Object obj, int i){
         String className = getClass(ArrayGetObj(obj, i)).getName();
         String hashCode = Integer.toHexString(System.identityHashCode(ArrayGetObj(obj, i)));
         return className + "@" + hashCode; 
     }
 
-    private String getObjectReference(Object obj, Field field){
+    public String getObjectReference(Object obj, Field field){
         String className = "";
         String hashCode = "";
         try{
