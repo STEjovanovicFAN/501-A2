@@ -21,110 +21,6 @@ public class Inspector {
         inspectFields(c, obj, recursive, depth);
     }    
 
-    private <T> boolean checkArrayEmpty( T [] array){
-        if(array.length == 0){
-            return true;
-        }
-        return false;
-    }
-    
-    private void formatOutputDepth(String value, int depth){
-        for(int i = 0; i < depth; i++){
-            System.out.print("\t");
-        }
-        System.out.println(value);
-    }
-
-    private void inspectImmediateSuperClass(Class c, Object obj, boolean recursive, int depth){
-        if(getSuperClass(c) == null){
-            formatOutputDepth("Super Class Name: " + "none", depth);
-        }
-
-        else{
-            formatOutputDepth("Super Class Name: " + getSimpleName(getSuperClass(c)),depth);
-            inspectClass(getSuperClass(c), obj, recursive, depth+1);
-        }
-    }
-
-    private void inspectInterfaces(Class c, Object obj, boolean recursive, int depth){
-        if(checkArrayEmpty(getInterfaces(c))){
-            formatOutputDepth("Interface Name: "  + "none", depth);
-        }
-
-        else{
-            for(Class inter: getInterfaces(c)){
-                formatOutputDepth("Interface Name: " + getSimpleName(inter),depth);
-                inspectClass(inter, obj, recursive, depth+1);
-            }
-        }
-    }
-
-    private void inspectConstructors(Class c, Object obj, boolean recursive, int depth){
-        if(checkArrayEmpty(getDeclaredConstructors(c))){
-            formatOutputDepth("Constructor Name: " + "none",depth);
-        }
-
-        else{
-            for(Constructor cons: getDeclaredConstructors(c)){
-                formatOutputDepth("Constructor Name: " + cons.getName(), depth);
-
-                if(checkArrayEmpty(cons.getParameterTypes())){
-                    formatOutputDepth("- Parameter: " + "none", depth+1);
-                }
-
-                else{
-                    for(Class par: cons.getParameterTypes()){
-                        formatOutputDepth("- Parameter: " + par.getName(), depth+1);
-                    }     
-                }
-
-                formatOutputDepth("- Modifier: " + ModifierToString(cons.getModifiers()), depth+1);
-
-            }
-        }
-    }
-
-    private void inspectMethods(Class c, Object obj, boolean recursive, int depth){
-        if(checkArrayEmpty(getDeclaredMethods(c))){
-            formatOutputDepth("Method Name: " + "none", depth);
-        }
-
-        else{
-            for(Method meth : getDeclaredMethods(c)){
-                formatOutputDepth("Method Name: " + meth.getName(), depth);
-
-                if(checkArrayEmpty(meth.getExceptionTypes())){
-                    formatOutputDepth("- Exception Type: " + "none", depth+1);
-                }
-                else{
-                    for(Class except: meth.getExceptionTypes()){
-                        formatOutputDepth("- Exception Type: " + except.getName(), depth+1);
-                    }
-                }
-
-                if(checkArrayEmpty(meth.getParameterTypes())){
-                    formatOutputDepth("- Parameter Type: " + "none", depth+1);
-                }
-
-                else{
-                    for(Class parType : meth.getParameterTypes()){
-                        formatOutputDepth("- Parameter Type: " + getSimpleName(parType), depth+1);
-                    }
-                }
-
-                if(meth.getReturnType() == null){
-                    formatOutputDepth("- Return Type: " + "none", depth+1);
-                }
-
-                else{
-                    formatOutputDepth("- Return Type: " + meth.getReturnType(), depth+1);
-                }
-
-                formatOutputDepth("- Modifier: " + ModifierToString(meth.getModifiers()), depth+1);
-            }
-        }
-    }
-
     private void inspectFields(Class c, Object obj, boolean recursive, int depth){
         if(checkArrayEmpty(getDeclaredFields(c))){
             formatOutputDepth("Declared Fields: " + "none", depth);
@@ -214,6 +110,96 @@ public class Inspector {
         }
     }
 
+    private void inspectMethods(Class c, Object obj, boolean recursive, int depth){
+        if(checkArrayEmpty(getDeclaredMethods(c))){
+            formatOutputDepth("Method Name: " + "none", depth);
+        }
+
+        else{
+            for(Method meth : getDeclaredMethods(c)){
+                formatOutputDepth("Method Name: " + meth.getName(), depth);
+
+                if(checkArrayEmpty(meth.getExceptionTypes())){
+                    formatOutputDepth("- Exception Type: " + "none", depth+1);
+                }
+                else{
+                    for(Class except: meth.getExceptionTypes()){
+                        formatOutputDepth("- Exception Type: " + except.getName(), depth+1);
+                    }
+                }
+
+                if(checkArrayEmpty(meth.getParameterTypes())){
+                    formatOutputDepth("- Parameter Type: " + "none", depth+1);
+                }
+
+                else{
+                    for(Class parType : meth.getParameterTypes()){
+                        formatOutputDepth("- Parameter Type: " + getSimpleName(parType), depth+1);
+                    }
+                }
+
+                if(meth.getReturnType() == null){
+                    formatOutputDepth("- Return Type: " + "void", depth+1);
+                }
+
+                else{
+                    formatOutputDepth("- Return Type: " + meth.getReturnType(), depth+1);
+                }
+
+                formatOutputDepth("- Modifier: " + ModifierToString(meth.getModifiers()), depth+1);
+            }
+        }
+    }
+
+    private void inspectConstructors(Class c, Object obj, boolean recursive, int depth){
+        if(checkArrayEmpty(getDeclaredConstructors(c))){
+            formatOutputDepth("Constructor Name: " + "none",depth);
+        }
+
+        else{
+            for(Constructor cons: getDeclaredConstructors(c)){
+                formatOutputDepth("Constructor Name: " + cons.getName(), depth);
+
+                if(checkArrayEmpty(cons.getParameterTypes())){
+                    formatOutputDepth("- Parameter: " + "none", depth+1);
+                }
+
+                else{
+                    for(Class par: cons.getParameterTypes()){
+                        formatOutputDepth("- Parameter: " + par.getName(), depth+1);
+                    }     
+                }
+
+                formatOutputDepth("- Modifier: " + ModifierToString(cons.getModifiers()), depth+1);
+
+            }
+        }
+    }
+
+    private void inspectInterfaces(Class c, Object obj, boolean recursive, int depth){
+        if(checkArrayEmpty(getInterfaces(c))){
+            formatOutputDepth("Interface Name: "  + "none", depth);
+        }
+
+        else{
+            for(Class inter: getInterfaces(c)){
+                formatOutputDepth("Interface Name: " + getSimpleName(inter),depth);
+                inspectClass(inter, obj, recursive, depth+1);
+            }
+        }
+    }
+
+    private void inspectImmediateSuperClass(Class c, Object obj, boolean recursive, int depth){
+        if(getSuperClass(c) == null){
+            formatOutputDepth("Super Class Name: " + "none", depth);
+        }
+
+        else{
+            formatOutputDepth("Super Class Name: " + getSimpleName(getSuperClass(c)),depth);
+            inspectClass(getSuperClass(c), obj, recursive, depth+1);
+        }
+    }
+
     private Class getSuperClass(Class c){
         return c.getSuperclass();
     }
@@ -272,5 +258,19 @@ public class Inspector {
             System.out.println("Error: something happened" + e);
         }
         return className + "@" + hashCode; 
+    }
+
+    private <T> boolean checkArrayEmpty( T [] array){
+        if(array.length == 0){
+            return true;
+        }
+        return false;
+    }
+    
+    private void formatOutputDepth(String value, int depth){
+        for(int i = 0; i < depth; i++){
+            System.out.print("\t");
+        }
+        System.out.println(value);
     }
 }
