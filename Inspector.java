@@ -19,7 +19,7 @@ public class Inspector {
     private void inspectClass(Class c, Object obj, boolean recursive, int depth) {
         String className = getSimpleName(c);
         formatOutputDepth("Declaring Class Name: " + className, depth);
-        
+
         inspectImmediateSuperClass(c, obj, recursive, depth);
         inspectInterfaces(c, obj, recursive, depth);
         inspectConstructors(c, obj, recursive, depth);
@@ -50,7 +50,7 @@ public class Inspector {
                 field.setAccessible(true);
                 try{
                     if(field.getType().isPrimitive()){
-                        String valueType = field.get(obj);
+                        String valueType = String.valueOf(field.get(obj));
                         formatOutputDepth("- Value: " + valueType, depth+1);
                     }
 
@@ -90,7 +90,7 @@ public class Inspector {
 
     private void handelArrayField(Class c, Object obj, boolean recursive, int depth){
         String componentType = getSimpleName(c.getComponentType());
-        String lengthUnit = ArrayGetLength(obj);
+        String lengthUnit = Integer.toString(ArrayGetLength(obj));
         formatOutputDepth("- Component Type: " + componentType, depth+1);
         formatOutputDepth("- Length: " + lengthUnit, depth+1);
         formatOutputDepth("- Contents: ", depth+1);
@@ -159,7 +159,7 @@ public class Inspector {
                 }
 
                 else{
-                    String returnTypeName = meth.getReturnType();
+                    String returnTypeName = String.valueOf(meth.getReturnType());
                     formatOutputDepth("- Return Type: " + returnTypeName, depth+1);
                 }
                 String modName = ModifierToString(meth.getModifiers());
@@ -281,14 +281,14 @@ public class Inspector {
         return className + "@" + hashCode; 
     }
 
-    private <T> boolean checkArrayEmpty( T [] array){
+    public <T> boolean checkArrayEmpty( T [] array){
         if(array.length == 0){
             return true;
         }
         return false;
     }
     
-    private void formatOutputDepth(String value, int depth){
+    public void formatOutputDepth(String value, int depth){
         for(int i = 0; i < depth; i++){
             System.out.print("\t");
         }
