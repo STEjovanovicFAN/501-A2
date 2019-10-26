@@ -3,7 +3,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Array;
-import java.util.*;
 
 public class Inspector {
 
@@ -21,6 +20,13 @@ public class Inspector {
         getMethods(c, obj, recursive, depth);
         getFields(c, obj, recursive, depth);
     }    
+
+    private <T> boolean checkArrayEmpty( T [] array){
+        if(array.length == 0){
+            return true;
+        }
+        return false;
+    }
     
     private void formatOutputDepth(String value, int depth){
         for(int i = 0; i < depth; i++){
@@ -41,7 +47,7 @@ public class Inspector {
     }
 
     private void getInterfaces(Class c, Object obj, boolean recursive, int depth){
-        if(c.getInterfaces().length == 0){
+        if(checkArrayEmpty(c.getInterfaces())){
             formatOutputDepth("Interface Name: "  + "none", depth);
         }
         else{
@@ -53,7 +59,7 @@ public class Inspector {
     }
 
     private void getConstructors(Class c, Object obj, boolean recursive, int depth){
-        if(c.getDeclaredConstructors().length == 0){
+        if(checkArrayEmpty(c.getDeclaredConstructors())){
             formatOutputDepth("Constructor Name: " + "none",depth);
         }
 
@@ -61,7 +67,7 @@ public class Inspector {
             for(Constructor cons: c.getDeclaredConstructors()){
                 formatOutputDepth("Constructor Name: " + cons.getName(), depth);
 
-                if(cons.getParameterTypes().length == 0){
+                if(checkArrayEmpty(cons.getParameterTypes())){
                     formatOutputDepth("- Parameter: " + "none", depth+1);
                 }
 
@@ -78,7 +84,7 @@ public class Inspector {
     }
 
     private void getMethods(Class c, Object obj, boolean recursive, int depth){
-        if(c.getDeclaredMethods().length == 0){
+        if(checkArrayEmpty(c.getDeclaredMethods())){
             formatOutputDepth("Method Name: " + "none", depth);
         }
 
@@ -86,7 +92,7 @@ public class Inspector {
             for(Method meth : c.getDeclaredMethods()){
                 formatOutputDepth("Method Name: " + meth.getName(), depth);
 
-                if(meth.getExceptionTypes().length == 0){
+                if(checkArrayEmpty(meth.getExceptionTypes())){
                     formatOutputDepth("- Exception Type: " + "none", depth+1);
                 }
                 else{
@@ -95,7 +101,7 @@ public class Inspector {
                     }
                 }
 
-                if(meth.getParameterTypes().length == 0){
+                if(checkArrayEmpty(meth.getParameterTypes())){
                     formatOutputDepth("- Parameter Type: " + "none", depth+1);
                 }
 
@@ -119,7 +125,7 @@ public class Inspector {
     }
 
     private void getFields(Class c, Object obj, boolean recursive, int depth){
-        if(c.getDeclaredFields().length == 0){
+        if(checkArrayEmpty(c.getDeclaredFields())){
             formatOutputDepth("Declared Fields: " + "none", depth);
         }
 
@@ -134,7 +140,7 @@ public class Inspector {
                 else{
                     formatOutputDepth("- Type: " + field.getType().getName(), depth+1);
                 }
-                
+
                 formatOutputDepth("- Modifier: " + Modifier.toString(field.getModifiers()), depth+1);
 
                 field.setAccessible(true);
