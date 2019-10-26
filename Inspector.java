@@ -1,7 +1,9 @@
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Array;
+import java.util.*;
 
 public class Inspector {
 
@@ -11,72 +13,192 @@ public class Inspector {
     }
 
     private void inspectClass(Class c, Object obj, boolean recursive, int depth) {
-        System.out.println("-------------------------------");
-        formatOutput("Declaring Class", getClass(c));
-        formatOutput("Immediate Superclass", getClass(getSuperClass(c)));
-        formatOutput("Interface", formatArray(getInterfaces(c)));
-        formatOutput("Constructors", formatArray(getConstructors(c)));
-        formatOutput("Methods", formatArray(getMethods(c)));
-        formatOutput("Fields", formatArray(getDeclaredFields(c)));
-        formatOutput("Fields Value", formatArray(getDeclaredFieldsValue(c, obj)));
 
-    }
-
-
-    private void formatOutput(String header, String result){
-        System.out.println(header + ": " + result);
-    }
-
-    private String getClass(Class c){
-        return c.getSimpleName();
-    }
-
-    private Class getSuperClass(Class c){
-        return c.getSuperclass();
-    }
-
-    private Class [] getInterfaces(Class c){
-        return c.getInterfaces();
-    }
-
-    private <T> String formatArray(T [] array){
-        if(array.length == 0){
-            return "";
+        formatOutputDepth("Declaring Class Name: " + c.getSimpleName(), depth);
+        getImmediateSuperClass(c, obj, recursive, depth);
+        getInterfaces(c, obj, recursive, depth);
+        getConstructors(c, obj, recursive, depth);
+        getMethods(c, obj, recursive, depth);
+        getFields(c, obj, recursive, depth);
+    }    
+    
+    private void formatOutputDepth(String value, int depth){
+        for(int i = 0; i < depth; i++){
+            System.out.print("\t");
         }
 
-        String retString = Arrays.toString(array).replace(", ", "\n-");
-        retString = retString.substring(0,0) + "\n-" + retString.substring(1);
-        retString = retString.substring(0,retString.length()-1); 
-        return retString;
+        System.out.println(value);
     }
 
-    private Constructor [] getConstructors(Class c){
-        return c.getConstructors();
+    private void getImmediateSuperClass(Class c, Object obj, boolean recursive, int depth){
+        if(c.getSuperclass() == null){
+            formatOutputDepth("Super Class Name: " + "none",depth);
+
+        }
+
+        else{
+            formatOutputDepth("Super Class Name: " + c.getSuperclass().getSimpleName(),depth);
+            inspectClass(c.getSuperclass(), obj, recursive, depth+1);
+        }
     }
 
-    private Method [] getMethods(Class c){
-        return c.getMethods();    
-    }
-
-    private Field [] getDeclaredFields(Class c){
-        return c.getDeclaredFields();
-    }
-
-    private Object [] getDeclaredFieldsValue(Class c, Object obj){
-        Field [] allFields = getDeclaredFields(c);
-        Object [] objectValues = new Object[allFields.length];
-        for(int i = 0; i < allFields.length; i++){
-            Field f = allFields[i];
-            f.setAccessible(true);
-
-            try{
-                objectValues[i] = f.get(obj);
+    private void getInterfaces(Class c, Object obj, boolean recursive, int depth){
+        if(c.getInterfaces().length == 0){
+            formatOutputDepth("Interface Name: "  + "none", depth);
+        }
+        else{
+            for(Class inter: c.getInterfaces()){
+                formatOutputDepth("Interface Name: " + inter.getSimpleName(),depth);
+                inspectClass(inter, obj, recursive, depth+1);
             }
-            catch(Exception e){
+        }
+    }
+
+    private void getConstructors(Class c, Object obj, boolean recursive, int depth){
+        if(c.getDeclaredConstructors().length == 0){
+            formatOutputDepth("Constructor Name: " + "none",depth);
+        }
+
+        else{
+            for(Constructor cons: c.getDeclaredConstructors()){
+                formatOutputDepth("Constructor Name: " + cons.getName(), depth);
+
+                if(cons.getParameterTypes().length == 0){
+                    formatOutputDepth("- Parameter: " + "none", depth+1);
+                }
+
+                else{
+                    for(Class par: cons.getParameterTypes()){
+                        formatOutputDepth("- Parameter: " + par.getName(), depth+1);
+                    }     
+                }
+
+                formatOutputDepth("- Modifier: " + Modifier.toString(cons.getModifiers()), depth+1);
 
             }
         }
-        return objectValues;
+    }
+
+    private void getMethods(Class c, Object obj, boolean recursive, int depth){
+        if(c.getDeclaredMethods().length == 0){
+            formatOutputDepth("Method Name: " + "none", depth);
+        }
+
+        else{
+            for(Method meth : c.getDeclaredMethods()){
+                formatOutputDepth("Method Name: " + meth.getName(), depth);
+
+                if(meth.getExceptionTypes().length == 0){
+                    formatOutputDepth("- Exception Type: " + "none", depth+1);
+                }
+                else{
+                    for(Class except: meth.getExceptionTypes()){
+                        formatOutputDepth("- Exception Type: " + except.getName(), depth+1);
+                    }
+                }
+
+                if(meth.getParameterTypes().length == 0){
+                    formatOutputDepth("- Parameter Type: " + "none", depth+1);
+                }
+
+                else{
+                    for(Class parType : meth.getParameterTypes()){
+                        formatOutputDepth("- Parameter Type: " + parType.getSimpleName(), depth+1);
+                    }
+                }
+
+                if(meth.getReturnType() == null){
+                    formatOutputDepth("- Return Type: " + "none", depth+1);
+                }
+
+                else{
+                    formatOutputDepth("- Return Type: " + meth.getReturnType(), depth+1);
+                }
+
+                formatOutputDepth("- Modifier: " + Modifier.toString(meth.getModifiers()), depth+1);
+            }
+        }
+    }
+
+    private void getFields(Class c, Object obj, boolean recursive, int depth){
+        if(c.getDeclaredFields().length == 0){
+            formatOutputDepth("Declared Fields: " + "none", depth);
+        }
+
+        else{
+            for(Field field: c.getDeclaredFields()){
+                formatOutputDepth("Declared Field Name: " + field.getName(), depth);
+                formatOutputDepth("- Type: " + field.getType().getName(), depth+1);
+                formatOutputDepth("- Modifier: " + Modifier.toString(field.getModifiers()), depth+1);
+
+                field.setAccessible(true);
+                try{
+                    if(field.getType().isPrimitive()){
+                        formatOutputDepth("- Value: " + field.get(obj), depth+1);
+                    }
+
+                    else if(field.getType().isArray()){
+                        handelArrayField(field.getType(), field.get(obj), recursive, depth);
+                    }
+
+                    //type of class 
+                    else{
+                        if(recursive){
+                            inspectClass(field.get(obj).getClass(), obj, recursive, depth);
+                        }
+
+                        else{
+                            formatOutputDepth("- Value: " + field.get(obj).getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(field.get(obj))), depth+1);
+                        }
+                    }
+
+                }
+
+                catch(NullPointerException e){
+                    formatOutputDepth("- Value: " + "null", depth+1);
+                }
+
+                catch(IllegalAccessException e){
+                    formatOutputDepth("- Value: Error! Cannot Access field", depth+1);
+                }
+
+                catch(Exception e){
+                    formatOutputDepth("-Value: Error! Something went really wrong, trace message-->" + e, depth+1);
+                }
+
+            }
+        }
+    }
+
+    private void handelArrayField(Class c, Object obj, boolean recursive, int depth){
+        formatOutputDepth("- Component Type: " + c.getComponentType().getSimpleName(), depth+1);
+        formatOutputDepth("- Length: " + Array.getLength(obj), depth+1);
+        formatOutputDepth("- Contents: ", depth+1);
+        
+        for(int i = 0; i < Array.getLength(obj); i++){
+            if(Array.get(obj, i) == null){
+                formatOutputDepth("- " + "null", depth+2);
+            }
+            else if(c.getComponentType().isPrimitive()){
+                formatOutputDepth("- " + Array.get(obj, i).getClass().getSimpleName(), depth+2);
+            }
+            //2d arrays
+            else if(c.getComponentType().isArray()){
+                handelArrayField(Array.get(obj, i).getClass(), Array.get(obj, i), recursive, depth+2);
+            }
+            //recursive 
+            else{
+                if(recursive){
+                    if(recursive){
+                        inspectClass(Array.get(obj, i).getClass(), Array.get(obj, i), recursive, depth+2);
+                    }
+
+                    else{
+                        formatOutputDepth("- Value: " + Array.get(obj, i).getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(Array.get(obj, i))), depth+2);
+                    }
+                }
+            }
+        }
     }
     
 }
