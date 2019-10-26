@@ -26,14 +26,12 @@ public class Inspector {
         for(int i = 0; i < depth; i++){
             System.out.print("\t");
         }
-
         System.out.println(value);
     }
 
     private void getImmediateSuperClass(Class c, Object obj, boolean recursive, int depth){
         if(c.getSuperclass() == null){
-            formatOutputDepth("Super Class Name: " + "none",depth);
-
+            formatOutputDepth("Super Class Name: " + "none", depth);
         }
 
         else{
@@ -128,7 +126,15 @@ public class Inspector {
         else{
             for(Field field: c.getDeclaredFields()){
                 formatOutputDepth("Declared Field Name: " + field.getName(), depth);
-                formatOutputDepth("- Type: " + field.getType().getName(), depth+1);
+
+                if(field.getType().isArray()){
+                    formatOutputDepth("- Type: " + "Array", depth+1);
+                }
+
+                else{
+                    formatOutputDepth("- Type: " + field.getType().getName(), depth+1);
+                }
+                
                 formatOutputDepth("- Modifier: " + Modifier.toString(field.getModifiers()), depth+1);
 
                 field.setAccessible(true);
